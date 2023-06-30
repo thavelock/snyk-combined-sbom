@@ -1,0 +1,1 @@
+__app_name__ = "snyk_combined_sbom"
