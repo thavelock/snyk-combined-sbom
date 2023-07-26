@@ -3,7 +3,7 @@
 
 import typer
 from rich import print
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn, MofNCompleteColumn
 from typing_extensions import Annotated
 
 from snyk_combined_sbom import snyk, utils
@@ -52,10 +52,16 @@ def create_data_structure(
         utils.create_target_directories(mapped_targets)
         progress.update(done, description="Output directories created \u2713", completed=1)
 
+    with Progress(
+        SpinnerColumn(),
+        MofNCompleteColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=False
+    ) as progress:
         # Retrieve the SBOMs for each project and store it in the correct directory
-        done = progress.add_task(description="Retrieve SBOMs for projects", total=1)
+        done = progress.add_task(description="Retrieve SBOMs for projects", total=utils.number_of_projects(mapped_targets))
         utils.retrieve_sboms_from_targets(mapped_targets, org_id, snyk_token, progress=progress, progress_id=done)
-        progress.update(done, description="SBOMs retrieved \u2713", completed=1)
+        progress.update(done, description="SBOMs retrieved \u2713")
 
 @app.command('clean')
 def clean_directory_structure():
