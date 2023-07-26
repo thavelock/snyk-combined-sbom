@@ -9,6 +9,7 @@ import rich
 
 from snyk_combined_sbom.constants import (SNYK_REST_API_BASE_URL,
                                           SNYK_REST_API_VERSION,
+                                          SNYK_API_TIMEOUT_DEFAULT,
                                           DEFAULT_SBOM_FORMAT)
 
 
@@ -36,7 +37,7 @@ def get_all_projects_in_org(org_id, snyk_token, origin=None):
             'GET',
             url,
             headers=headers,
-            timeout=60)
+            timeout=SNYK_API_TIMEOUT_DEFAULT)
 
         response_json = json.loads(response.content)
 

@@ -55,11 +55,14 @@ def retrieve_sboms_from_targets(mapped_targets, org_id, snyk_token, progress=Non
                 project_sbom = snyk.get_sbom_for_project(org_id, project['id'], snyk_token)
 
                 if progress is not None:
-                    progress.update(progress_id, description=f"Creating SBOM: {filename}")
+                    progress.update(progress_id, description=f"Creating SBOM: {filename}", advance=1.0)
 
                 with open(filename, 'w', encoding='utf-8') as f:
                     f.write(project_sbom)
                     f.close()
+
+            elif progress is not None:
+                progress.update(progress_id, description=f"SBOM Exists: {filename}", advance=1.0)
 
 def remove_output_directory():
     try:
@@ -71,3 +74,10 @@ def remove_output_directory():
 
 def remove_special_chars(text):
     return text.replace('/', '_').replace('.', '_').replace(':', '_').replace('(', '_').replace(')', '_')
+
+def number_of_projects(mapped_targets):
+    count = 0
+    for target in mapped_targets.values():
+        count += len(target['projects'])
+
+    return count
