@@ -91,6 +91,17 @@ def get_all_targets_in_org(org_id, snyk_token, origin=None):
     return targets
 
 def get_sbom_for_project(org_id, project_id, snyk_token, sbom_format=DEFAULT_SBOM_FORMAT):
+    """Retrieve an SBOM for a given project
+
+    Args:
+        org_id (string): ID of Snyk Organization
+        project_id (string): ID of Snyk Project
+        snyk_token (string): Snyk API token
+        sbom_format (string, optional): Format for SBOM to returned as. Defaults to DEFAULT_SBOM_FORMAT.
+
+    Returns:
+        string: SBOM string, or None if error retrieving SBOM
+    """
 
     headers = {
         'Authorization': f'token {snyk_token}'
@@ -103,5 +114,18 @@ def get_sbom_for_project(org_id, project_id, snyk_token, sbom_format=DEFAULT_SBO
             url,
             headers=headers,
             timeout=60)
+
+    if (response.status_code != 200):
+        if (response.status_code == 404):
+            response_json = json.loads(response.content)
+
+            errors = ''
+
+            for error in response_json['errors']:
+                errors += f"{error['code']}, "
+
+            print(f"\u26A0 Could not get SBOM for project {project_id}, errors: {errors.strip(', ')}")
+
+        return None
 
     return response.text
