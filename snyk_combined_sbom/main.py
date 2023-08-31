@@ -3,7 +3,8 @@
 
 import typer
 from rich import print
-from rich.progress import Progress, SpinnerColumn, TextColumn, MofNCompleteColumn
+from rich.progress import (MofNCompleteColumn, Progress, SpinnerColumn,
+                           TextColumn)
 from typing_extensions import Annotated
 
 from snyk_combined_sbom import snyk, utils
@@ -26,6 +27,9 @@ def create_data_structure(
         origin: str = typer.Option(
                     default='any',
                     help='Project origin')):
+
+    """Main entry command to generate and retrieve SBOMs from an org
+    """
 
     with Progress(
         SpinnerColumn(),
@@ -60,11 +64,17 @@ def create_data_structure(
     ) as progress:
         # Retrieve the SBOMs for each project and store it in the correct directory
         done = progress.add_task(description="Retrieve SBOMs for projects", total=utils.number_of_projects(mapped_targets))
-        utils.retrieve_sboms_from_targets(mapped_targets, org_id, snyk_token, progress=progress, progress_id=done)
-        progress.update(done, description="SBOMs retrieved \u2713")
+        failed_sboms = utils.retrieve_sboms_from_targets(mapped_targets, org_id, snyk_token, progress=progress, progress_id=done)
+
+        if (failed_sboms == 0):
+            progress.update(done, description="SBOMs retrieved \u2713")
+        else:
+            progress.update(done, description=f"SBOMs retrieved, failed to retrieve {failed_sboms} {'SBOM' if failed_sboms == 1 else 'SBOMs'}")
 
 @app.command('clean')
 def clean_directory_structure():
+    """Command to remove generated SBOM directory structure
+    """
     utils.remove_output_directory()
 
 @app.callback()

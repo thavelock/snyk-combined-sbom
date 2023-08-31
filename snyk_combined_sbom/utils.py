@@ -1,3 +1,6 @@
+"""A collection of utility functions
+"""
+
 import os
 import shutil
 
@@ -45,6 +48,8 @@ def create_target_directories(mapped_targets):
 
 def retrieve_sboms_from_targets(mapped_targets, org_id, snyk_token, progress=None, progress_id=-1):
 
+    failed_sboms = 0
+
     for target in mapped_targets.values():
         for project in target['projects']:
 
@@ -54,15 +59,22 @@ def retrieve_sboms_from_targets(mapped_targets, org_id, snyk_token, progress=Non
 
                 project_sbom = snyk.get_sbom_for_project(org_id, project['id'], snyk_token)
 
-                if progress is not None:
-                    progress.update(progress_id, description=f"Creating SBOM: {filename}", advance=1.0)
+                if (project_sbom != None):
+                    if progress is not None:
+                        progress.update(progress_id, description=f"Creating SBOM: {filename}", advance=1.0)
 
-                with open(filename, 'w', encoding='utf-8') as f:
-                    f.write(project_sbom)
-                    f.close()
+                    with open(filename, 'w', encoding='utf-8') as f:
+                        f.write(project_sbom)
+                        f.close()
+                else:
+                    if progress is not None:
+                        progress.update(progress_id, description=f"Skipping SBOM: {filename}")
+                        failed_sboms += 1
 
             elif progress is not None:
                 progress.update(progress_id, description=f"SBOM Exists: {filename}", advance=1.0)
+
+    return failed_sboms
 
 def remove_output_directory():
     try:
