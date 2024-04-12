@@ -1,3 +1,5 @@
+![snyk-oss-category](https://github.com/snyk-labs/oss-images/blob/main/oss-community.jpg)
+
 # Snyk Combined SBOM
 
 * `snyk-combined-sbom` is designed to help create SBOMs for Snyk Targets in a Snyk Org
