@@ -1,4 +1,4 @@
-![snyk-oss-category](https://github.com/snyk-labs/oss-images/blob/main/oss-community.jpg)
+![snyk-oss-category](https://github.com/snyk-labs/oss-images/blob/main/oss-example.jpg)
 
 # Snyk Combined SBOM
 
